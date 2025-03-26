@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode, TextType
-from helpersinline import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from helpersinline import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 
 class TestHelpers(unittest.TestCase):
   def test_balanced(self):
@@ -107,3 +107,24 @@ class TestHelpers(unittest.TestCase):
     new_nodes = split_nodes_link([node])
     self.assertListEqual([TextNode("Here is a link ", TextType.NORMAL_TEXT), TextNode("Click Me", TextType.LINK_TEXT, "www.youtube.com"), TextNode(" visit us! Or try ", TextType.NORMAL_TEXT),
       TextNode("Click this one", TextType.LINK_TEXT, "www.twitch.tv")], new_nodes)
+
+  def test_text_to_textnodes(self):
+    text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](www.test.com) and a [link](www.test.com)"
+    new_nodes = text_to_textnodes(text)
+    self.assertListEqual([
+      TextNode("This is ", TextType.NORMAL_TEXT),
+      TextNode("text", TextType.BOLD_TEXT),
+      TextNode(" with an ", TextType.NORMAL_TEXT),
+      TextNode("italic", TextType.ITALIC_TEXT),
+      TextNode(" word and a ", TextType.NORMAL_TEXT),
+      TextNode("code block", TextType.CODE_TEXT),
+      TextNode(" and an ", TextType.NORMAL_TEXT),
+      TextNode("obi wan image", TextType.IMAGE_TEXT, "www.test.com"),
+      TextNode(" and a ", TextType.NORMAL_TEXT),
+      TextNode("link", TextType.LINK_TEXT, "www.test.com")
+    ], new_nodes)
+
+  def test_text_to_textnode_1(self):
+    text = "This text only has **bold** in it"
+    new_nodes = text_to_textnodes(text)
+    self.assertListEqual([TextNode("This text only has ", TextType.NORMAL_TEXT), TextNode("bold", TextType.BOLD_TEXT), TextNode(" in it", TextType.NORMAL_TEXT)], new_nodes)

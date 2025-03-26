@@ -4,7 +4,7 @@ import re
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
   new_nodes = []
   for node in old_nodes:
-    if not isinstance(node, TextNode):
+    if node.text_type != TextType.NORMAL_TEXT:
       new_nodes.append(node)
       continue
     parts = node.text.split(delimiter)
@@ -63,11 +63,19 @@ def split_nodes_link(old_nodes):
           parts = remaining_text.split(f"[{link_text}]({link_url})", 1)
           if parts[0]:
             new_nodes.append(TextNode(parts[0], TextType.NORMAL_TEXT))
-            new_nodes.append(TextNode(link_text, TextType.LINK_TEXT, link_url))
-            remaining_text = parts[1] if len(parts) > 1 else ""
+          new_nodes.append(TextNode(link_text, TextType.LINK_TEXT, link_url))
+          remaining_text = parts[1] if len(parts) > 1 else ""
         if remaining_text:
           new_nodes.append(TextNode(remaining_text, TextType.NORMAL_TEXT))
       else:
         new_nodes.append(node)
   return new_nodes
    
+def text_to_textnodes(text):
+  node = TextNode(text, TextType.NORMAL_TEXT) 
+  nodes = split_nodes_image([node]) 
+  nodes = split_nodes_link(nodes) 
+  nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD_TEXT) 
+  nodes = split_nodes_delimiter(nodes, "`", TextType.CODE_TEXT) 
+  nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC_TEXT) 
+  return nodes
