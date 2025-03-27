@@ -45,7 +45,8 @@ class ParentNode(HTMLNode):
       html += " ".join([f' {key}="{value}"' for key, value in self.props.items()])
     html += ">"
     for child in self.children:
-      html += child.to_html()
+      if child:
+        html += child.to_html()
     html += f"</{self.tag}>"
     return html
   
