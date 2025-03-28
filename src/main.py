@@ -5,19 +5,20 @@ from pathlib import Path
 import sys
 
 dir_path_static = "./static"
-dir_path_public = "./public"
+dir_path_public = "./docs"
 dir_path_content = "./content"
 template_path = "./template.html"
 
 def main():
-  
-  if os.path.exists("./public"):
-    shutil.rmtree("./public")
+  args = sys.argv
+  basepath = args[1] if len(args) > 1 else "/"
+  if os.path.exists(dir_path_public):
+    shutil.rmtree(dir_path_public)
 
-  os.mkdir("./public")
+  os.mkdir(dir_path_public)
 
-  copy_static("./static", "./public")
-  generate_pages_recursive(dir_path_content, template_path, dir_path_public)
+  copy_static(dir_path_static, dir_path_public)
+  generate_pages_recursive(dir_path_content, template_path, dir_path_public, basepath)
 
 def copy_static(source, destination):
   for item in os.listdir(source):
@@ -43,7 +44,7 @@ def extract_title(markdown):
     raise Exception("No title found.")
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
   print(f"Generating page from {from_path} to {dest_path} using {template_path}...")
   src_file = open(from_path)
   src_contents = src_file.read()
@@ -59,6 +60,7 @@ def generate_page(from_path, template_path, dest_path):
   title = extract_title(src_contents)
   template_contents = template_contents.replace("{{ Title }}", title)
   template_contents = template_contents.replace("{{ Content }}", html)
+  template_contents.replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
 
   html_filepath = os.path.dirname(dest_path)
   if html_filepath != "":
@@ -68,7 +70,7 @@ def generate_page(from_path, template_path, dest_path):
   to_file.write(template_contents)
   to_file.close()
   
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
   for item in os.listdir(dir_path_content):
     source_path = os.path.join(dir_path_content, item)
     dest_path = os.path.join(dest_dir_path, item)
@@ -76,9 +78,9 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
     if os.path.isfile(source_path):
       dest_path = Path(dest_path).with_suffix(".html")
       print(dest_path)
-      generate_page(source_path, template_path, dest_path)
+      generate_page(source_path, template_path, dest_path, basepath)
     else:
-      generate_pages_recursive(source_path, template_path, dest_path)
+      generate_pages_recursive(source_path, template_path, dest_path, basepath)
   
 
 
