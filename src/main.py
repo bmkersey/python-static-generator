@@ -12,6 +12,7 @@ template_path = "./template.html"
 def main():
   args = sys.argv
   basepath = args[1] if len(args) > 1 else "/"
+  print(basepath)
   if os.path.exists(dir_path_public):
     shutil.rmtree(dir_path_public)
 
@@ -60,8 +61,8 @@ def generate_page(from_path, template_path, dest_path, basepath):
   title = extract_title(src_contents)
   template_contents = template_contents.replace("{{ Title }}", title)
   template_contents = template_contents.replace("{{ Content }}", html)
-  template_contents.replace("href=\"/", f"href=\"{basepath}")
-  template_contents.replace("src=\"/", f"src=\"{basepath}")
+  template_contents = template_contents.replace("href=\"/", f"href=\"{basepath}")
+  template_contents = template_contents.replace("src=\"/", f"src=\"{basepath}")
 
   html_filepath = os.path.dirname(dest_path)
   if html_filepath != "":
