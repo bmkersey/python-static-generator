@@ -20,10 +20,10 @@ class HTMLNode:
 
 class LeafNode(HTMLNode):
   def __init__(self, tag, value, props=None):
-    super().__init__(tag=tag, value=value, props=props)
+    super().__init__(tag, value, None, props=props)
 
   def to_html(self):
-    if not self.value:
+    if self.value == None:
       raise ValueError("Missing value")
     if self.tag == None:
       return self.value
@@ -33,7 +33,7 @@ class LeafNode(HTMLNode):
   
 class ParentNode(HTMLNode):
   def __init__(self, tag, children, props=None):
-    super().__init__(tag=tag, children=children, props=props)
+    super().__init__(tag, None, children, props)
   
   def to_html(self):
     if not self.tag:
@@ -61,7 +61,7 @@ def text_node_to_html_node(text_node):
     case TextType.CODE_TEXT:
       return LeafNode("code", text_node.text)
     case TextType.IMAGE_TEXT:
-      return LeafNode("img", None, {"src": text_node.url, "alt": text_node.text})
+      return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
     case TextType.LINK_TEXT:
       return LeafNode("a", text_node.text, {"href": text_node.url})
     case _:

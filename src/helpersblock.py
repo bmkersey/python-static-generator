@@ -122,7 +122,8 @@ def create_quote_node(block):
   return quote_node
 
 def create_paragraph_node(block):
-  content = " ".join([line.strip() for line in block.split("\n")])
+  lines = block.split("\n")
+  content = " ".join(lines)
   children = text_to_children(content)
   return ParentNode("p", children)
   
@@ -142,7 +143,7 @@ def create_heading_node(block):
       break
   
   level = min(6,max(1,level))
-  content = block[level:].strip()
+  content = block[level +1:]
 
   children = text_to_children(content)
   return ParentNode(f"h{level}", children)
